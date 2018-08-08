@@ -1,0 +1,7 @@
+1. Python3 & Django2 must be installed.
+2. Run server using - "python manage.py runserver" on articleapp directory.
+3. accress application using. http://127.0.0.1:8000/mysite/
+4. Access django admin. http://127.0.0.1:8000/admin
+5. Please run above application on internet connection because CDN library has been used for UI.
+
+Thank you!!
