@@ -25,7 +25,7 @@ def save_article(request):
         article = Article()
         article.name = request.POST['name'].strip()
         print(article.name)
-        article.title = request.POST['name'].strip()
+        article.title = request.POST['title'].strip()
         article.content = request.POST['content'].strip()
         article.save()
     else:
