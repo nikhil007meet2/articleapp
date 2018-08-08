@@ -139,6 +139,7 @@
 			function updateDataTableView(){
 				datatable.clear().draw();
 				$('.table').dataTable().fnAddData(dataTableDataObj);
+				$('.table').dataTable().fnSort([4,'desc']);
 
 			}
 </script>
