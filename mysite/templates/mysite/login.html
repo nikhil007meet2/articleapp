@@ -1,0 +1,209 @@
+{% load staticfiles %}
+<!--[if IE 7]> <meta http-equiv="X-UA-Compatible" content="IE=Edge" /> <![endif]-->
+<!--[if IE 8]> <meta http-equiv="X-UA-Compatible" content="IE=Edge" /> <![endif]-->
+<!--[if IE 9]> <meta http-equiv="X-UA-Compatible" content="IE=Edge" /> <![endif]-->
+<!--[if IE 10]> <meta http-equiv="X-UA-Compatible" content="IE=9" /> <![endif]-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en" >
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>App Login</title>
+		<link rel="shortcut icon" type="image/png" href="{% static 'c3/images/favicon.ico' %}"/>
+    <link rel="stylesheet" type="text/css" media="screen" href="/static/c3/css/std/bootstrap-3.3.4.css"/>
+    <link rel="stylesheet" type="text/css" media="screen" href="/static/c3/css/std/font-awesome.css"/>
+    <link rel="stylesheet" type="text/css" media="screen"  href="/static/c3/css/std/animate.css"/>
+    <link rel="stylesheet" type="text/css" media="screen" href="/static/c3/css/c3.login.v4.css"/>
+    <script src="/static/c3/js/std/jquery-2.2.4.js" charset="utf-8" type="text/javascript"></script>
+    <script src="/static/c3/js/std/jquery.haml-1.3.js" charset="utf-8" type="text/javascript"></script>
+  </head>
+
+  <body class="gray-bg">
+    {% csrf_token %}
+    <script type="text/javascript">
+      c3LoginBody();
+      function c3LoginBody(){
+        $('body').haml(
+        ['%div.login-content.loginColumns.animated.fadeInDown', {id:'login-content', style:'max-width: 365px;margin: 0 auto;'},
+
+          ['%div.ibox-content',{style:'padding: 15px 20px 105px 20px !important;'},
+            ['%form.m-t.login.active', {name: 'loginForm', role:'form', method:'post', action:'/', enctype:'multipart/form-data', onsubmit:'return blankTextFieldValidator();'},
+                ['%img', {id:'img_circle', src:'/static/c3/images/login-logo-bjp.gif' || 'generic_logo.png', width:'100%', style:'margin-bottom:10px;', height:'100%', alt:'image'}], //logo_c3.png
+              ['%div.form-group', ['%input.form-control', {type:'text', placeholder:'Username', id:'id_user_name', name:'username', required:'required', autocomplete:'off'}]],
+              ['%div.form-group', ['%input.form-control', {type:'password', placeholder:'Password', id:'id_password', name:'password', required:'required'}]],
+              ['%div', {id:'blank_message_div', style:'margin-left:12px; font:bold;'}],
+              {% if is_error %}
+                ['%div', {id:'error_msg', style:'color:red;margin: 13px 0px 5px 20px;'}, ['%li', {style:'list-style: none;'}, ['%b', ['%label', {style:'font-size:14px;'}, 'Invalid Username or Password!']]]],
+              {% endif %},
+              {% if is_user_inactive %}
+                ['%div', {id:'error_msg', style:'color:red;margin: 13px 0px 5px 10px; padding:1px 10px;'}, ['%li', {style:'list-style: none;'}, ['%b', ['%label', {style:'font-size:14px;'}, 'Your account has been disabled due to consecutive wrong password entries. Please contact the system administration at eps@bnpparibasfortis.com.']]]],
+              {% endif %}
+              ['%button.btn.btn-primary.block.full-width.m-b', {id:'id_login', name:'action', type:'submit', value:'Login'}, 'Login'],
+              ['%input', {type:'hidden', name:'redirect_url', value:'{{ redirect_url }}'}],
+              ['%div.form-group', ['%a.checkbox.pull-left', {onclick:'showPasswordRecover();', href:'#', id:'forgot_pass'}, ['%small.checkbox-text.pull-left', 'Forgot Password']]],
+              ['%a.checkbox.pull-left.btn.btn-sm.btn-white.btn-block', {href:'mailto:eps@bnpparibasfortis.com?Subject=Support', id:'contact_admin', target:'_top'}, 'Contact Admin']
+            ]
+          ]
+        ],
+        ['%div.login-content2.loginColumns.animated.fadeInDown', {id:'login-content2', style:'display: none;'},
+          ['%div.row',
+            /*['%div.col-md-6',
+              ['%h2.font-bold', 'Welcome to MAFFFL']
+            ],*/
+            ['%div.col-md-6',
+              ['%div.ibox-content',{style:'padding: 15px 20px 32px 20px !important;'},
+                ['%form.m-t.login.active', {name: 'recoverForm', role:'form', method:'post', action:'', enctype:'multipart/form-data'},
+                  ['%div.form-group', ['%input.form-control', {type:'text', placeholder:'Username', id:'username', name:'username', required:'required', autocomplete:'off'}]],
+                  ['%div.form-group', ['%input.form-control', {type:'password', placeholder:'Email Id', id:'email_id', name:'email_id', required:'required'}]],
+                  ['%div',['%input.btn.btn-primary.block.full-width.m-b', {id:'id_recover', type:'button', name:'action', value:'Reset', onclick:'submitPassRecover();'}]],
+                   ['%div.login-form-action.clearfix', ['%a.checkbox.pull-left', {onclick:'location.href="/"', href:'#'}, ['%span.checkbox-text.pull-left', {style:'position: absolute;'}, 'Login']]]
+                ]
+              ]
+            ]
+          ]
+        ]);
+       }
+
+      function blankTextFieldValidator(){
+        if (!loginForm.username.value){
+          divNum = document.getElementById('blank_message_div').getElementsByTagName("div").length ;
+          $('#error_msg').remove();
+          if(divNum == 0){
+            var div = '<div style="color:red;margin: 13px 0px 5px 9px;"><li style="list-style: none;"><b><label style="font-size: 14px;">Please Enter Username!</label></b></li></div>'
+             $("#blank_message_div").append(div);
+          }
+          else if(divNum > 0){
+            $('#blank_message_div').find('div').remove();
+            var div = '<div style="color:red;margin: 13px 0px 5px 9px;"><li style="list-style: none;"><b><label style="font-size: 14px;">Please Enter Username!</label></b></li></div>'
+             $("#blank_message_div").append(div);
+          }
+           loginForm.username.focus();
+           return (false);
+        }
+        else if (!loginForm.password.value){
+          divNum1 = document.getElementById('blank_message_div').getElementsByTagName("div").length ;
+          if(divNum1 > 0){
+            $('#blank_message_div').find('div').remove();
+            var div1 = '<div style="color:red;margin: 13px 0px 5px 9px;"><li style="list-style: none;"><b><label style="font-size: 14px;">Please Enter Password!</label></b></li></div>'
+             $("#blank_message_div").append(div1);
+          }
+          else if(loginForm.username.value){
+            $('#blank_message_div').find('div').remove();
+            var div1 = '<div style="color:red;margin: 13px 0px 5px 9px;"><li style="list-style: none;"><b><label style="font-size: 14px;">Please Enter Password!</label></b></li></div>'
+             $("#blank_message_div").append(div1);
+
+          }
+          loginForm.password.focus();
+          return (false);
+        }
+        return (true);
+      }
+
+      function blankTextFieldValidator() {
+        if (!loginForm.username.value) {
+          divNum = document.getElementById('blank_message_div').getElementsByTagName("div").length;
+          $('#error_msg').remove();
+          if (divNum == 0) {
+            var div = '<div style="color:red;margin: 13px 0px 5px 9px;"><li style="list-style: none;"><b><label style="font-size: 14px;">Please Enter Username!</label></b></li></div>'
+            $("#blank_message_div").append(div);
+          } else if (divNum > 0) {
+            $('#blank_message_div').find('div').remove();
+            var div = '<div style="color:red;margin: 13px 0px 5px 9px;"><li style="list-style: none;"><b><label style="font-size: 14px;">Please Enter Username!</label></b></li></div>'
+            $("#blank_message_div").append(div);
+          }
+          loginForm.username.focus();
+          return (false);
+        } else if (!loginForm.password.value) {
+          divNum1 = document.getElementById('blank_message_div').getElementsByTagName("div").length;
+          if (divNum1 > 0) {
+            $('#blank_message_div').find('div').remove();
+            var div1 = '<div style="color:red;margin: 13px 0px 5px 9px;"><li style="list-style: none;"><b><label style="font-size: 14px;">Please Enter Password!</label></b></li></div>'
+            $("#blank_message_div").append(div1);
+          } else if (loginForm.username.value) {
+            $('#blank_message_div').find('div').remove();
+            var div1 = '<div style="color:red;margin: 13px 0px 5px 9px;"><li style="list-style: none;"><b><label style="font-size: 14px;">Please Enter Password!</label></b></li></div>'
+            $("#blank_message_div").append(div1);
+          }
+          loginForm.password.focus();
+          return (false);
+        }
+        return (true);
+      }
+
+      document.getElementById("id_user_name").focus();
+
+      function showPasswordRecover() {
+        var xhr;
+        var loginDiv = document.getElementById('login-content');
+        var recoverDiv = document.getElementById('login-content2');
+        if (loginDiv.style.display !== 'none') {
+          loginDiv.style.display = 'none';
+          recoverDiv.style.display = 'block';
+          document.getElementById("username").focus();
+        } else {
+          loginDiv.style.display = 'block';
+        }
+      }
+
+      function submitPassRecover() {
+        var user_name, user_action, user_email_id;
+        user_name = document.getElementById("username").value;
+        user_email_id = document.getElementById("email_id").value;
+        user_action = document.getElementById("id_recover").value;
+
+        if (user_name) {
+          if (!validateEmail(user_email_id)) {
+            jAlert('Please enter valid email Id.', 'Error Message');
+            return false;
+          }
+
+          if (window.XMLHttpRequest) {
+            xhr = new XMLHttpRequest();
+          } else {
+            xhr = new ActiveXObject("Microsoft.XMLHTTP");
+          }
+          if (!xhr) {
+            console.log('Unable to create AJAX instance.');
+            return false;
+          }
+          xhr.onreadystatechange = handleResponse;
+          xhr.open('POST', '/aps/forgot-password/');
+          xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+          xhr.send('username=' + encodeURIComponent(user_name) + '&emailid=' + encodeURIComponent(user_email_id) + '&action=' + encodeURIComponent(user_action));
+        } else {
+          jAlert("Please fill Username", 'Error Message');
+        }
+      }
+
+      function validateEmail(str) {
+        var emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+        return emailPattern.test(str);
+      }
+
+      function handleResponse() {
+        try {
+          if (xhr.readyState === 4 && xhr.status === 200) {
+            response = JSON.parse(xhr.responseText);
+            jAlert(response[0].message, 'Alert Message', function() {
+              if (response[0].error === 'false') {
+                if (!window.location.origin) {
+                  window.location.origin = window.location.protocol + "//" + window.location.host + "/";
+                }
+                window.location.assign(window.location.origin);
+              } else {
+                return false;
+              }
+            });
+          } else {
+            console.log('There was a problem with the request');
+          }
+        } catch (e) {
+          console.log('Caught exception: ' + e.description);
+        }
+      }
+    </script>
+  </body>
+</html>
