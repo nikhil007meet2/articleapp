@@ -1,0 +1,293 @@
+<div class="page-layout blank p-24" fusePerfectScrollbar>
+    <h2 class="allPagesLabelHeader">{{'IEP_ASSESSMENT.IEPASSESSMENT_LABEL' | translate}}</h2>
+    <div fxLayout="column" fxLayoutGap="20px" fxLayoutAlign="center" class="row-example">
+    <form [formGroup]="iepAssessmentForm">
+        <div fxLayout="row" fxLayout.lt-xs="column" fxLayoutGap="12px" fxLayoutAlign="" class="p-16 tableContainer"
+            fxLayoutGap.lt-md="12px" style="border: 1px solid #d3d3d3; border-radius: 5px; background-color: #fff;">
+
+            <mat-form-field fxFlex="40">
+                <mat-select formControlName="selectedStudentId" placeholder="{{'IEP_ASSESSMENT.STUDENTS' | translate}} *"
+                    (selectionChange)="studentSelectionChanged($event.value)">
+                    <mat-option *ngFor="let item of studentList" value="{{item.id}}">
+                        {{getFullName(item)}}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+            <mat-form-field fxFlex="15" style="min-width: 80px!important;"><!--fxFlex="10" class="w-124"-->
+                <mat-select style="min-width: 80px!important" formControlName="selectedAcademicYear" placeholder="{{'IEP_ASSESSMENT.ACADEMICYEAR' | translate}} *">
+                    <mat-option *ngFor="let item of academicYearList" value="{{item.lovCode}}">
+                        {{item.displayValue}}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+            
+
+            <div fxFlex="15">
+                <button mat-flat-button class="mat_orange mb-8 mt-12" id="" (click)="getStudentAssessment()">{{'IEP_ASSESSMENT.GETASSESSMENT' | translate}}</button>
+            </div>
+            <div fxFlex="10">
+                <button mat-flat-button class="mb-8 mt-12" 
+                    color="accent"
+                    [disabled]="isCreateAssessmentBtnDisabled"
+                    (click)="createNewAssessment()"
+                >{{'IEP_ASSESSMENT.CREATEASSESSMENT' | translate}}</button>
+            </div>
+                <!-- <div fxFlex="10" fx-layout="row" fx-flex  fx-layout-align="end">
+                        <button mat-flat-button class="mb-8" id=""
+                        color="accent" style="margin-right: 10px">Reset</button>
+                        
+                        
+                 </div> -->
+
+        </div>
+        
+                <mat-form-field [hidden]="true" *ngIf="false">
+                    <input matInput formControlName="id" [readonly]="true">
+                    <input matInput formControlName="studentId" [readonly]="true">
+                    <input matInput formControlName="teacherId" [readonly]="true">
+                    <input matInput formControlName="iepStatus" [readonly]="true">
+                    <input matInput [readonly]="true">
+                    <input matInput formControlName="academicYear" [readonly]="true">
+                    <input matInput formControlName="schoolId" [readonly]="true">
+                    <input matInput formControlName="isViewOnly" [readonly]="true">
+                    <input matInput formControlName="getTeacherNameInfo" [readonly]="true">
+                </mat-form-field>
+                
+                <div fxLayout="column" fxLayout.lt-xs="column" fxLayoutGap="12px" class="mat-elevation-z8  p-16 tableContainer"
+                fxLayoutGap.lt-md="12px">
+                <!-- <div fxLayout="row" fxLayoutGap="20px" fxLayoutAlign="left" class="row-example"> -->
+                    <div fxLayout="row" fxLayoutAlign="left" class="row-example">
+                    <div fxFlex="30" style="margin-right: 0px!important">
+                        <strong>
+                            {{'IEP_ASSESSMENT.STUDENTNAME' | translate}} :  <label style="font-weight: normal">
+                                {{getStudentFullName()}}
+                            </label>
+                        </strong>
+                       
+                    </div>
+                    <div fxFlex="20" style="min-width: 186px">
+                        <strong>
+                            {{'IEP_ASSESSMENT.ACADEMICYEAR' | translate}} : <label style="font-weight: normal">
+                                {{getAcademicYear()}}
+                            </label>
+                        </strong>
+                        
+                    </div>
+                    
+                        <!-- <strong>
+                            {{'IEP_ASSESSMENT.IEP_LEVEl' | translate}} :
+                        </strong>
+                        <label>
+                            {{getIepLevel()}}
+                        </label> -->
+                        <div fxFlex="20" style="min-width: 200px;" fxLayout="row"  fxLayout.lt-md="column" ><strong fxFlex="50" style="min-width: 80px!important">{{'IEP_ASSESSMENT.IEP_LEVEl' | translate}}&nbsp;*: </strong>                            
+                                <!--fxFlex="55" --><mat-select formControlName="iepLevel" #iepLevelDropdown  fxFlex="50" style="min-width: 112px !important;"
+                                    placeholder="----------------"
+                                    (selectionChange)="iepLevelSelectionChanged($event)"
+                                    [disabled]="toggleIepLevelDisabled()">
+                                    <mat-option [value]="item.lovCode" *ngFor="let item of ageGroupList">{{item.displayValue}}</mat-option>
+                                </mat-select>
+                               </div>
+                    <div fxFlex="30"></div>                            
+                   
+                </div>
+                <div fxLayout="row" fxLayout.lt-xs="column" class="mt-12" style="margin-bottom: 0;">
+                    <div fxFlex="30">
+                        <strong>
+                            {{'IEP_ASSESSMENT.TEACHERNAME' | translate}} :  <label style="font-weight: normal">
+                                {{getTeacherName()}}
+                            </label>
+                        </strong>
+                       
+                    </div>
+                    <div fxFlex="20" ><!--style="min-width: 166px"-->
+                        <strong>
+                            {{'IEP_ASSESSMENT.IEPSTATUS' | translate}} : <strong class="blue-700-fg">
+                                {{getIepStatus()}}
+                            </strong>
+                        </strong>
+                        
+                    </div>
+                    
+                    
+                    <div fxFlex="20"  fxLayout="row"  fxLayout.lt-md="column" style="min-width: 200px;"><strong fxFlex="50" class="mb-8" style="min-width: 80px!important;">{{'IEP_ASSESSMENT.PREFERREDLANG' | translate}}&nbsp;: </strong>
+                  <!--fxFlex="50"-->  <mat-select  fxFlex="50" style="min-width: 112px !important;"  formControlName="preferredLanguage" placeholder="----------------"
+                        (selectionChange)="onPrefferedLangChange($event)" >
+                        <mat-option *ngFor="let item of languageList" value="{{item.code}}">
+                            {{item.label}}
+                        </mat-option>
+                    </mat-select></div>
+                        
+                        <div fxFlex="30" style="text-align:right" ><!--style="min-width: 186px"-->
+                                <button mat-flat-button class="mat_orange mb-8" id=""
+                                    style="margin-right: 10px" *ngIf="toggleDraftButton()" (click)="submitStudentIepAssessment('Draft')">{{'IEP_ASSESSMENT.DRAFT' | translate}}</button>
+                                <button mat-flat-button class="mb-8" color="accent" *ngIf="toggleSubmitButton()"
+                                    style="margin-right: 10px"
+                                    [disabled]= "toggleSubmitBtnEnable()"
+                                    (click)="submitStudentIepAssessment('Submitted')"
+                                    >{{'IEP_ASSESSMENT.SUBMIT' | translate}}</button>
+                                <button mat-flat-button class="mb-8" *ngIf="toggleResetButton()"
+                                (click)="resetIepAssessmentFormUI()"
+                                    color="primary" style="margin-right: 10px">{{'IEP_ASSESSMENT.RESET' | translate}}</button>
+                                    
+                            </div>
+                </div>
+    
+                <!-- <div fxLayout="row">
+                    <mat-form-field fxFlex="20">
+                        <mat-select (selectionChange)="onPrefferedLangChange($event)" placeholder="{{'IEP_ASSESSMENT.PREFERREDLANG' | translate}} *">
+                            <mat-option *ngFor="let item of languageList" value="{{item.code}}">{{item.label}}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div> -->
+                <fieldset>
+
+                
+                <div fxLayout="row">
+                    <mat-accordion class="example-headers-align" fxFlex="100" #accordion="matAccordion" multi>
+                        <mat-expansion-panel *ngFor="let domainItem of domainItemList">
+                            <mat-expansion-panel-header class="right-aligned-header blue-grey-500-bg">
+                                <mat-panel-title style="color: #ffffff"> <strong>{{domainItem.bulletText}} {{ domainItem.lovCode !== 'global' ? '.' : ''}} {{domainItem.item}}
+                                    </strong> 
+                                    <strong style="margin-left:10px;" *ngIf="domainItem.appearedQuestionCount == domainItem.questionCount"><mat-icon class="s-20">done</mat-icon></strong> <!--getDomainQuestionsAppearedCount(domainItem)-->
+                                </mat-panel-title>
+                                <ng-container *ngIf="domainItem.lovCode !== 'global'">
+                                    <mat-panel-description 
+                                        style="color: #ffffff"><strong>
+                                            <span>{{'IEP_ASSESSMENT.QUESTIONS' | translate}} : {{ domainItem.appearedQuestionCount }}/{{domainItem.questionCount}}  {{'IEP_ASSESSMENT.GOAL' | translate}} : {{ domainItem.selectedGoalsCount }}</span></strong> <!--getDomainSelectedGoals(domainItem) getDomainQuestionsAppearedCount(domainItem)-->
+                                    </mat-panel-description>
+                                </ng-container>
+                                
+                            </mat-expansion-panel-header>
+                            <ng-container *ngIf="domainItem.lovCode !== 'global'">
+                                <mat-expansion-panel hideToggle expanded #matExpandBaseLine1_2
+                                    *ngFor="let subDomainObject of domainItem.subDomain">
+                                    <mat-expansion-panel-header class="right-aligned-header blue-grey-50-bg" *ngIf="subDomainObject.header"
+                                        (click)="onlyExpandPanel(matExpandBaseLine1_2, $event)">
+                                        <mat-panel-title> <strong>{{subDomainObject.header}}</strong> </mat-panel-title>
+                                        <mat-panel-description><strong><span class="blue-900-fg">{{'IEP_ASSESSMENT.GOAL' | translate}} : <span>{{ subDomainObject.selectedGoalsCount }}</span></span></strong> <!--getSubDomainSelectedGoals(subDomainObject)-->
+                                        </mat-panel-description>
+                                    </mat-expansion-panel-header>
+                                    <mat-table #table [dataSource]="subDomainObject.questions" style="height: 300px; overflow-y: scroll;">
+                                        <!-- Position Column -->
+                                        <ng-container matColumnDef="position">
+                                            <mat-header-cell *matHeaderCellDef style="flex: 0 0 60px;"> {{'IEP_ASSESSMENT.NUMBER' | translate}}
+                                            </mat-header-cell>
+                                            <mat-cell *matCellDef="let element" style="flex: 0 0 60px;">
+                                                {{element.bulletText}} </mat-cell>
+                                        </ng-container>
+                                        <!-- <ng-container *ngTemplateOutlet="temp"></ng-container> -->
+                                        <!-- Parameter Column -->
+                                        <ng-container matColumnDef="parameter">
+                                            <mat-header-cell *matHeaderCellDef> {{'IEP_ASSESSMENT.QUESTIONS' | translate}} </mat-header-cell>
+                                            <mat-cell *matCellDef="let element"> {{element.item}} </mat-cell>
+                                        </ng-container>
+        
+                                        <!-- NA Column -->
+                                        <ng-container matColumnDef="na">
+                                            <mat-header-cell *matHeaderCellDef style="flex: 0 0 75px;"> {{'IEP_ASSESSMENT.NA' | translate}}
+                                            </mat-header-cell>
+                                            <mat-cell *matCellDef="let element; let i = index" style="flex: 0 0 75px;">
+                                                <mat-checkbox class="" color="primary" value="{{element.isNA}}" 
+                                                    [disabled]="isViewOnlyFormControlValue"
+                                                    [checked]="element.isNA" 
+                                                    (change)="onNAchange($event, element)"></mat-checkbox>
+                                            </mat-cell>
+                                        </ng-container>
+        
+                                        
+        
+                                        <!-- Grade Column -->
+                                        <ng-container matColumnDef="grade">
+                                            <mat-header-cell *matHeaderCellDef style="flex: 0 0 180px;"> {{'IEP_ASSESSMENT.GRADE' | translate}}
+                                            </mat-header-cell>
+                                            <mat-cell *matCellDef="let element; let i = index" style="flex: 0 0 180px;">
+                                                <mat-radio-group #grade aria-label="Select an option" style="margin-right: 5px;" [value]="element.gradevalue" [disabled]="element.isNA || isViewOnlyFormControlValue">
+                                                    <mat-radio-button *ngFor ="let item of element.gradingList" 
+                                                        value="{{item.lovCode}}"
+                                                        
+                                                        
+                                                        (change)="onGradingSelection(element, $event, item)"
+                                                        style="font-size: 14px;width: 100%;">{{item.displayValue}} </mat-radio-button>
+                                                </mat-radio-group>
+                                            </mat-cell>
+                                        </ng-container>
+        
+                                        <!-- Complex Column -->
+                                        <ng-container matColumnDef="score">
+                                            <mat-header-cell *matHeaderCellDef style="flex: 0 0 130px;"> {{'IEP_ASSESSMENT.SCORE' | translate}}
+                                            </mat-header-cell>
+                                            <mat-cell *matCellDef="let element" style="flex: 0 0 130px;">
+                                                <mat-select #scoringType [value]="element.scoringType" [disabled]="isViewOnlyFormControlValue || toggleScoringTypeFreez(element)" (selectionChange)="onScoringSelection(element, $event)">
+                                                    <mat-option *ngFor="let item of element.scoringList" 
+                                                        [value]="item.lovCode"
+                                                        > {{ item.displayValue }} </mat-option>
+                                                </mat-select>
+                                            </mat-cell>
+                                        </ng-container>
+    
+                                        <!-- Goal Column -->
+                                        <ng-container matColumnDef="goal">
+                                                <mat-header-cell *matHeaderCellDef style="flex: 0 0 105px;"> {{'IEP_ASSESSMENT.GOAL' | translate}}
+                                                </mat-header-cell>
+                                                <mat-cell *matCellDef="let element" style="flex: 0 0 105px;">
+                                                    <mat-checkbox #goal  style="margin-left: 10px" [checked]="element.isGoalSelected" (change)="onGoalchange($event, element, subDomainObject)" [disabled]="isViewOnlyFormControlValue || element.isNA"></mat-checkbox>
+                                                </mat-cell>
+                                            </ng-container>
+        
+                                        <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
+                                        <!-- <mat-row [ngClass]="{ 'warn-100-bg': isWarningColorForRow(row)}"  *matRowDef="let row; columns: displayedColumns;"></mat-row> -->
+                                        <mat-row [ngStyle]="{ 'border-left': isWarningColorForRow(row) == true ? '3px solid red' : '0px solid grey'}"  *matRowDef="let row; columns: displayedColumns; "></mat-row>
+                                    </mat-table>
+                                </mat-expansion-panel>
+                            </ng-container>
+
+                            <!-- Subject Part -->
+                            <ng-container *ngIf="domainItem.lovCode === 'global'">
+                                <mat-expansion-panel hideToggle expanded #matExpandBaseLine1_2 *ngFor="let subDomainObject of domainItem.subDomain">
+                                        <mat-table #table [dataSource]="subDomainObject.questions">
+                                            <ng-container matColumnDef="position">
+                                                    <mat-header-cell *matHeaderCellDef style="flex: 0 0 90px;"> {{'IEP_ASSESSMENT.NUMBER' | translate}} </mat-header-cell>
+                                                    <mat-cell *matCellDef="let element" style="flex: 0 0 90px;"> {{element.bulletText}} </mat-cell>
+                                            </ng-container>
+
+                                            <!-- Subject Column -->
+                                            <ng-container matColumnDef="subject">
+                                                <mat-header-cell *matHeaderCellDef style="flex: 0 0 150px;"> {{'IEP_ASSESSMENT.SUBJECT' | translate}} </mat-header-cell>
+                                                <mat-cell *matCellDef="let element" style="flex: 0 0 150px;"> {{element.item}} </mat-cell>
+                                            </ng-container>
+
+                                            <!-- Section Dropdown -->
+                                            <ng-container matColumnDef="sections">
+                                                <mat-header-cell *matHeaderCellDef style="flex: 0 0 150px;"> {{'IEP_ASSESSMENT.SECTION' | translate}} </mat-header-cell>
+                                                <mat-cell *matCellDef="let element" style="flex: 0 0 150px;">
+                                                    <mat-select #scoringType [value]="element.scoringType" [disabled]="isViewOnlyFormControlValue || toggleScoringTypeFreez(element)" (selectionChange)="onScoringSelection(element, $event)">
+                                                        <mat-option *ngFor="let item of getSubjectSectionList(element)" 
+                                                            [value]="item.lovCode"
+                                                            > {{ item.displayValue }} </mat-option>
+                                                    </mat-select>
+                                                </mat-cell>
+                                            </ng-container>
+            
+
+                                            <mat-header-row *matHeaderRowDef="subjectDisplayedColumns"></mat-header-row>
+                                            <mat-row *matRowDef="let row; columns: subjectDisplayedColumns; "></mat-row>
+                                        </mat-table>
+                                </mat-expansion-panel>
+                            </ng-container>
+                            
+                        </mat-expansion-panel>
+                    </mat-accordion>
+                </div>
+                <!-- <div fxLayout="row">
+                    <mat-form-field fxFlex="100">
+                        <textarea matInput placeholder="{{'IEP_ASSESSMENT.NOTES' | translate}} *"></textarea>
+                    </mat-form-field>
+                </div> -->
+                </fieldset>
+            </div>
+        </form>
+        
+
+    </div>
+</div>
